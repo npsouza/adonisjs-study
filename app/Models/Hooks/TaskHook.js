@@ -2,9 +2,8 @@
 
 const TaskHook = exports = module.exports = {}
 
-const Mail = use('Mail')
-const Helpers = use('Helpers')
-const Env = use('Env')
+const Kue = use('Kue')
+const Job = use('App/Jobs/NewTaskMail')
 
 TaskHook.sendNewTaskMail = async (taskInstance) => {
   // quando alterar a task ou criar uma nova task
@@ -15,20 +14,5 @@ TaskHook.sendNewTaskMail = async (taskInstance) => {
 
   const { title } = taskInstance
 
-  await Mail.send(
-    ['emails.new_task'],
-    { username, title, hasAttachment: !!file },
-    message => {
-      message
-        .to(email)
-        .from(Env.get('MAIL_FROM'))
-        .subject('Nova tarefa para você')
-
-      if (file) {
-        message.attach(Helpers.tmpPath(`uploads/${file.file}`), {
-          filename: file.name
-        })
-      }
-    }
-  )
+  Kue.dispatch(Job.key, { email, username, file, title }, { attempts: 3 })
 }
