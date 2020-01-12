@@ -10,17 +10,12 @@ const Project = use('App/Models/Project')
  * Resourceful controller for interacting with projects
  */
 class ProjectController {
-  /**
-   * Show a list of all projects.
-   * GET projects
-   *
-   * @param {object} ctx
-   * @param {Request} ctx.request
-   * @param {Response} ctx.response
-   * @param {View} ctx.view
-   */
-  async index ({ request, response, view }) {
-    const projects = await Project.query().with('user').fetch()
+  async index ({ request }) {
+    const { page } = request.get()
+
+    const projects = await Project.query()
+      .with('user')
+      .paginate(page)
 
     return projects
   }
