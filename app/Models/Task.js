@@ -8,7 +8,7 @@ class Task extends Model {
   }
 
   user () {
-    return this.belongsTo('App/Models/Project')
+    return this.belongsTo('App/Models/User')
   }
 
   file () {
